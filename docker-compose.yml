@@ -1,0 +1,48 @@
+services:
+
+  zdev-api:
+    build:
+      context: api/
+      dockerfile: Dockerfile
+    image: zdev-api:latest
+    container_name: zdev-api
+    restart: unless-stopped
+    environment:
+      - TZ=${TZ:-Europe/Paris}
+      - LANG=C.UTF-8
+    ports:
+      - "5000:5000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/')"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  zdev-ide:
+    build:
+      context: ide/
+      dockerfile: Dockerfile
+    image: zdev-ide:latest
+    container_name: zdev-ide
+    restart: unless-stopped
+    environment:
+      - PASSWORD=${IDE_PASSWORD:-zdev}
+      - TZ=${TZ:-Europe/Paris}
+      - LANG=C.UTF-8
+    ports:
+      - "8443:8443"
+    volumes:
+      - ~/zdev/projects:/home/zdev/workspace
+      - ~/zdev/zowe:/home/zdev/.zowe
+      - ~/zdev/editor/settings:/home/zdev/.local/share/code-server/User
+      - ~/zdev/editor/extensions:/home/zdev/.local/share/code-server/extensions
+      - ~/zdev/cache/npm:/home/zdev/.npm
+      - ~/zdev/cache/pip:/home/zdev/.cache/pip
+      - ~/zdev/.zshrc:/home/zdev/.zshrc
+      - ~/zdev/.gitconfig:/home/zdev/.gitconfig
+      - ~/.ssh:/home/zdev/.ssh:ro
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8443/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
