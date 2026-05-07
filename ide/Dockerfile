@@ -29,8 +29,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates curl file fontconfig fonts-dejavu-core \
     git htop iproute2 jq less \
     libcairo2 libgdk-pixbuf-2.0-0 libpangocairo-1.0-0 \
-    lsof procps python3 python3-pip python3-venv \
-    tree unzip vim wget zip zsh \
+    lsof nano openssh-client procps python3 python3-pip python3-venv \
+    shellcheck shfmt tree unzip vim wget zip zsh \
     && rm -rf /var/lib/apt/lists/*
 
 

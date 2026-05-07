@@ -2,156 +2,114 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## What this project is
+## Project Overview
 
-A containerized mainframe development environment with two components:
+**zdev** is a containerized IBM z/OS mainframe development environment: VS Code in the browser (`zdev-ide`) plus a FastAPI backend (`zdev-api`), running on Linux (AMD64) and macOS Apple Silicon (ARM64) with enterprise proxy support.
 
-- **`ide/`** — Docker image running [code-server](https://github.com/coder/code-server) (VS Code in the browser), pre-loaded with IBM mainframe tools (Zowe CLI, IBM Z Open Editor), Python tooling, and ~35 VS Code extensions.
-- **`api/`** — FastAPI backend (Python 3.14) served alongside the IDE.
+## Commands
 
-The IDE is **ephemeral by design**: all user data persists via host-mounted volumes under `~/zdev/`. Destroying the container loses nothing.
-
-Designed to run on **macOS Apple Silicon (ARM64) at work behind a proxy** and on **Linux Ubuntu 24.04 (AMD64) at home without proxy** — the same Dockerfile and Makefile handle both automatically.
-
----
-
-## Common commands
+### Build & Run
 
 ```bash
-make help           # list all available commands
-make build          # build both images (auto-detects arch, proxy from HTTP_PROXY)
-make up             # docker compose up -d
-make down           # docker compose down
-make logs           # docker compose logs -f
-make setup-host     # one-time: creates ~/zdev/ on the host
-make fetch-ext      # download .vsix files from the Marketplace
+cp .env.example .env          # Configure IDE_PASSWORD, TZ, HTTP_PROXY
+make setup-host               # Create ~/zdev/ volume structure (first install)
+make fetch-ext                # Download .vsix extensions from Marketplace
+make build                    # Build both Docker images
+make up                       # Start containers (detached)
+make down                     # Stop containers
+make logs                     # Stream logs from both services
+make clean                    # Remove local images
 ```
 
-Override proxy manually: `make build PROXY=http://10.0.0.1:3128`
+Access: VS Code at `http://localhost:8443`, API at `http://localhost:5000`.
 
-### Python / api (local dev)
+### API Development
 
 ```bash
 cd api
-uv sync                      # install / sync dependencies
+uv sync                                                    # Install deps into .venv/
 uv run uvicorn zapi.main:app --reload --host 0.0.0.0 --port 5000
-uv run ruff check . --fix
-uv run pytest
-uv add <package>
+uv run ruff check . --fix && uv run ruff format .
+uv run pytest                                              # Run tests
+uv add <package>                                           # Add dependency (updates uv.lock)
 ```
 
-**Always use `uv`. Never `pip` or `poetry`.**
-
----
-
-## Repository structure
-
-```
-zdev/
-├── Makefile                              ← build / run / setup (single entry point)
-├── docker-compose.yml                    ← reads vars from .env
-├── .env.example                          ← template: HTTP_PROXY, TZ, IDE_PASSWORD
-│
-├── ide/                                  ← container code-server
-│   ├── Dockerfile                        ← one file, multi-platform (AMD64 + ARM64)
-│   ├── entrypoint.sh                     ← applies config after volume mounts
-│   ├── ruff.toml                         ← Python linter config (inside container)
-│   ├── settings.json                     ← VS Code user settings (inside container)
-│   ├── setup_host.sh                     ← creates ~/zdev/ on the host
-│   ├── fetch_extensions.sh               ← downloads .vsix from Marketplace
-│   ├── copilot/
-│   │   ├── instructions.md               ← Copilot global instructions
-│   │   └── instructions/
-│   │       ├── mainframe.instructions.md ← COBOL, JCL, z/OS
-│   │       └── open.instructions.md      ← Python, Bash, TypeScript
-│   ├── extensions/                       ← pre-downloaded .vsix (gitignored, .gitkeep)
-│   └── zowe/                             ← Zowe CLI offline archives
-│
-└── api/                                  ← container FastAPI
-    ├── Dockerfile
-    ├── pyproject.toml                    ← hatchling build, deps, dev deps
-    ├── .python-version                   ← Python 3.14
-    ├── uv.lock
-    └── src/
-        └── zapi/
-            ├── __init__.py
-            └── main.py
-```
-
----
+Always use `uv`, never `pip` directly.
 
 ## Architecture
 
+### Services
+
+| Service | Port | Base | Role |
+|---------|------|------|------|
+| `zdev-ide` | 8443 | Debian | code-server + IBM mainframe tools (Zowe CLI v3, Z Open Editor, Db2/CICS explorers) + Java 21, Node.js, Python |
+| `zdev-api` | 5000 | Python 3.14-slim | FastAPI backend (MVP: single `GET /` status endpoint) |
+
+### Critical Pattern: Extension Synchronization
+
+Docker volumes are mounted *after* image layers, so extensions installed into code-server's default path would be masked by the volume. The workaround:
+
+1. Extensions are staged in `/opt/code-server/extensions/` during image build (not masked).
+2. `ide/entrypoint.sh` syncs staged extensions to the volume (`~/zdev/editor/extensions/`), rewrites `extensions.json` paths, and clears `.obsolete`.
+3. `settings.json` is copied **only on first start** (if absent) — user UI customizations persist across restarts.
+4. Extensions the user installs go directly to the volume and persist independently.
+
+### Data Persistence
+
+All user data lives in `~/zdev/` on the host and survives container recreation:
+
 ```
-docker-compose.yml
-├── zdev-ide  context: ide/   port 8443  ← code-server + mainframe tools
-│             ~/zdev/projects           → /home/zdev/workspace
-│             ~/zdev/zowe               → /home/zdev/.zowe
-│             ~/zdev/editor/settings   → .../code-server/User
-│             ~/zdev/editor/extensions → .../code-server/extensions
-│             ~/zdev/cache/{npm,pip}   → /home/zdev/.{npm,.cache/pip}
-│             ~/zdev/.{zshrc,gitconfig} → /home/zdev/…
-│             ~/.ssh                   → /home/zdev/.ssh  :ro
-└── zdev-api  context: api/   port 5000  ← FastAPI (uvicorn)
+~/zdev/projects/          → /home/zdev/workspace
+~/zdev/zowe/              → /home/zdev/.zowe
+~/zdev/editor/settings/   → VS Code settings
+~/zdev/editor/extensions/ → VS Code extensions (synced by entrypoint)
+~/zdev/cache/npm|pip/     → package caches
+~/.ssh                    → SSH keys (read-only)
 ```
 
-**Proxy handling:** `HTTP_PROXY` / `HTTPS_PROXY` are passed as `--build-arg` at build time and **cleared** from the final image (step 12 of the Dockerfile). The running container never carries proxy settings.
+### Proxy Support
 
-**Config files at runtime:** `ruff.toml`, `settings.json`, and `copilot/` are copied to `/tmp/` in the image. `entrypoint.sh` copies them to `~/` at each container start, *after* volumes are mounted — otherwise the volume mounts would hide them.
+Pass `HTTP_PROXY` via environment or `make build PROXY=http://...`. The proxy is used only at build time and stripped from the final image (safe for air-gapped distribution).
 
-**Offline extensions:** `.vsix` files are baked into the image from `ide/extensions/`, avoiding Marketplace access in restricted networks.
+### Copilot Instructions
 
----
+`ide/copilot/instructions/` contains two instruction files applied automatically by VS Code Copilot based on file glob patterns:
+- `mainframe.instructions.md` — COBOL, JCL, z/OS, Db2, CICS
+- `scripting.instructions.md` — Python, Bash, TypeScript
 
-## Python standards (api and scripts)
+### API Future Design
 
-- **Type hints** required on all function signatures (parameters and return type).
-- **f-strings** only — no `%` formatting, no `.format()`.
-- **`pathlib.Path`** for all filesystem paths — never `os.path`.
-- **`logging`** for production output; `print()` only in one-off scripts or CLI entry points.
-- **Specific exceptions** only — never bare `except:` or `except Exception:`.
-- Line length: **88 characters** (Ruff/Black style).
+The API (`zdev-api`) will expose functions callable from the VS Code terminal in the browser. The IDE terminal can reach the API via `http://zdev-api:5000/` (Docker Compose default network). A `zdev` shell function is pre-configured in `~/zdev/.zshrc` (written by `setup_host.sh`):
 
-### Docstrings
+```bash
+zdev() { curl -s "http://zdev-api:5000${1:-/}"; }
+# Usage: zdev /datasets, zdev /jobs/submit
+```
 
-Every `.py` file requires a **module-level docstring** summarising purpose, inputs, outputs, and key assumptions. Target a reader who knows Python basics but nothing about the business domain or z/OS.
+Future endpoints should be designed as simple HTTP calls usable with `curl`. Authentication should be lightweight (API key in header) given the local/LAN deployment model.
 
-Public functions use **Google-style docstrings** with `Args`, `Returns` (unless `None`), and `Raises` sections.
+## Key Files
 
-### Naming
+```
+Makefile                        # Single build/orchestration entry point
+docker-compose.yml              # Service definitions and volume mounts
+.env.example                    # Config template (IDE_PASSWORD, TZ, HTTP_PROXY)
+ide/
+  Dockerfile                    # Multi-platform (AMD64/ARM64)
+  entrypoint.sh                 # Extension sync + startup logic
+  fetch_extensions.sh           # Download .vsix files from Marketplace
+  setup_host.sh                 # Create ~/zdev/ directory structure
+  copilot/instructions/         # GitHub Copilot instruction files
+api/
+  src/zapi/main.py              # FastAPI application
+  pyproject.toml                # Dependencies and Ruff config
+  uv.lock                       # Must be committed — ensures reproducible builds
+```
 
-| Element | Convention |
-|---|---|
-| Variable / function | `snake_case` |
-| Class | `PascalCase` |
-| Module-level constant | `UPPER_SNAKE_CASE` |
-| Private helper | `_leading_underscore` |
+## Design Decisions
 
----
-
-## Bash standards
-
-- Start every script with `set -euo pipefail`.
-- Line length: **80 characters**; use `\` for continuation.
-
----
-
-## TypeScript (VS Code extension development)
-
-TypeScript is mandatory — never plain JavaScript. Use Node.js + `npm` (not `uv`).
-
-Key rules:
-- Enable `strict` mode in `tsconfig.json` (non-negotiable).
-- No `any` type — use `unknown` + type guards.
-- Every `Disposable` must be pushed to `context.subscriptions`.
-- Webviews must define a strict CSP — never `'unsafe-inline'` in `script-src`.
-- Use `vscode.workspace.fs` for file I/O (works in remote/virtual FS).
-- Line length: **120 characters**.
-
-Full conventions: `ide/copilot/instructions/open.instructions.md`
-
----
-
-## Mainframe (COBOL / JCL / z/OS)
-
-Full IBM Enterprise COBOL 6.5, JCL, VSAM, Db2, and CICS standards: `ide/copilot/instructions/mainframe.instructions.md`
+- **`uv` over pip/poetry**: faster builds, simpler lock files, better for Docker layer caching.
+- **Extensions in `/opt/`**: solves Docker volume masking without any compromise on persistence.
+- **Makefile as entry point**: language-agnostic, handles platform detection (`uname -m`) automatically.
+- **Offline `.vsix` install**: supports corporate firewalls; `make fetch-ext` downloads ahead of time.
+- **`uv.lock` committed**: reproducible builds across all environments — never `.gitignore` it.

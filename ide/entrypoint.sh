@@ -22,7 +22,15 @@ export JAVA_HOME=/opt/java
 export PATH="$JAVA_HOME/bin:$PATH"
 
 cp /tmp/ruff.toml /home/zdev/ruff.toml
-cp /tmp/settings.json /home/zdev/.local/share/code-server/User/settings.json
+
+# Settings VS Code : on copie uniquement au premier démarrage.
+# Après, l'utilisateur peut personnaliser son environnement via l'UI
+# sans que ses changements soient écrasés au redémarrage.
+if [ ! -f /home/zdev/.local/share/code-server/User/settings.json ]; then
+    cp /tmp/settings.json /home/zdev/.local/share/code-server/User/settings.json
+fi
+
+# Instructions Copilot : toujours mises à jour (config projet, pas préférences utilisateur).
 cp -r /tmp/copilot/ /home/zdev/.config/copilot/
 
 # Synchronisation des extensions intégrées à l'image vers le volume utilisateur.

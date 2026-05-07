@@ -1,15 +1,11 @@
 {
   // ==========================================
   // GESTION DU PROXY
+  // Laisser vide si aucun proxy n'est nécessaire.
+  // Exemple : "http://mon-proxy:3128"
   // ==========================================
-  "http.noProxy": [
-    "dev.prodinfo.fr.cly",
-    "sysb.prodinfo.fr.cly",
-    "sysr.prodinfo.fr.cly",
-    "wd002app8520",
-    "wd002app8523"
-  ],
-  "http.proxy": "http://10.242.16.144:8080",
+  "http.noProxy": [],
+  "http.proxy": "",
   // ==========================================
   // INTERFACE & APPARENCE
   // ==========================================

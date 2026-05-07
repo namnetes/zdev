@@ -321,6 +321,10 @@ echo ""
 # échoue, et d'en garder trace pour le récapitulatif final.
 # =============================================================================
 
+# ── Shell / Bash ──────────────────────────────────────────────────────────────
+fetch_extension "timonwong.shellcheck"          || ERRORS+=("timonwong.shellcheck")
+fetch_extension "mkhl.shfmt"                    || ERRORS+=("mkhl.shfmt")
+
 # ── Python ────────────────────────────────────────────────────────────────────
 fetch_extension "ms-python.python"              || ERRORS+=("ms-python.python")
 fetch_extension "ms-python.debugpy"             || ERRORS+=("ms-python.debugpy")
@@ -332,6 +336,7 @@ fetch_extension "charliermarsh.ruff"            || ERRORS+=("charliermarsh.ruff"
 fetch_extension "tamasfe.even-better-toml"      || ERRORS+=("tamasfe.even-better-toml")
 fetch_extension "ZainChen.json"                 || ERRORS+=("ZainChen.json")
 fetch_extension "redhat.vscode-yaml"            || ERRORS+=("redhat.vscode-yaml")
+fetch_extension "redhat.vscode-xml"             || ERRORS+=("redhat.vscode-xml")
 fetch_extension "mechatroner.rainbow-csv"       || ERRORS+=("mechatroner.rainbow-csv")
 
 # ── Interface ─────────────────────────────────────────────────────────────────
@@ -342,6 +347,9 @@ fetch_extension "Catppuccin.catppuccin-vsc"     || ERRORS+=("Catppuccin.catppucc
 # ── IA — GitHub Copilot (abonnement GitHub requis) ───────────────────────────
 fetch_extension "GitHub.copilot"                || ERRORS+=("GitHub.copilot")
 fetch_extension "GitHub.copilot-chat"           || ERRORS+=("GitHub.copilot-chat")
+
+# ── Git ───────────────────────────────────────────────────────────────────────
+fetch_extension "mhutchie.git-graph"            || ERRORS+=("mhutchie.git-graph")
 
 # ── Documentation ─────────────────────────────────────────────────────────────
 fetch_extension "yzhang.markdown-all-in-one"    || ERRORS+=("yzhang.markdown-all-in-one")

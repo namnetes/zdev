@@ -5,7 +5,7 @@
 # Référence des règles : https://docs.astral.sh/ruff/rules/
 
 line-length = 88
-target-version = "py311"
+target-version = "py314"
 
 [lint]
 select = [
@@ -41,7 +41,7 @@ ignore = [
 fixable = ["ALL"]
 
 [lint.isort]
-known-first-party = ["devinit"]
+known-first-party = ["zapi"]
 force-sort-within-sections = true
 
 [lint.mccabe]
@@ -51,10 +51,6 @@ max-complexity = 10
 max-args = 8
 
 [lint.per-file-ignores]
-# Typer CLI: bool args are part of the API contract, high arg count is unavoidable
-"src/devinit/cli.py" = ["FBT001", "FBT002", "FBT003", "PLR0913", "C901"]
-# Templates: render_*() names are self-documenting, no docstrings needed
-"src/devinit/templates/*" = ["D103"]
 # Tests: function-name is self-documenting, magic values are expected in fixtures
 "tests/*" = ["D101", "D102", "D103", "PLR2004"]
 

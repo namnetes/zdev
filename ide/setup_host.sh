@@ -56,8 +56,29 @@ mkdir -p "$ZDEV_DIR/cache/pip"  # monté dans /home/zdev/.cache/pip
 
 # ── Fichiers de configuration ─────────────────────────────────────────────────
 # Docker exige que les fichiers montés existent sur l'hôte avant le démarrage
-# du conteneur. On les crée vides s'ils n'existent pas.
-touch "$ZDEV_DIR/.zshrc"     # monté dans /home/zdev/.zshrc
+# du conteneur.
+
+# .zshrc — configuration de base du shell dans le conteneur.
+# Modifiable librement depuis le terminal VS Code ou directement sur l'hôte.
+cat > "$ZDEV_DIR/.zshrc" << 'EOF'
+# ~/.zshrc — configuration du shell zsh dans le conteneur zdev-ide.
+# Ce fichier est persisté dans ~/zdev/.zshrc sur la machine hôte.
+# Vous pouvez le modifier depuis le terminal VS Code ou directement sur l'hôte.
+
+# ── zdev API ──────────────────────────────────────────────────────────────────
+# Raccourci pour appeler l'API zdev depuis le terminal VS Code.
+# L'API tourne dans le conteneur zdev-api, accessible via le réseau Docker.
+#
+# Exemples d'utilisation :
+#   zdev               → appelle GET /  (statut de l'API)
+#   zdev /datasets     → appelle GET /datasets
+#   zdev /jobs/submit  → appelle GET /jobs/submit
+zdev() {
+    local path="${1:-/}"
+    curl -s "http://zdev-api:5000${path}"
+}
+EOF
+
 touch "$ZDEV_DIR/.gitconfig" # monté dans /home/zdev/.gitconfig
 
 # ── Droits d'accès ────────────────────────────────────────────────────────────

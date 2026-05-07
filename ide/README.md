@@ -19,7 +19,7 @@ ide/
 │   ├── instructions.md     ← Instructions globales (tous types de fichiers)
 │   └── instructions/
 │       ├── mainframe.instructions.md  ← COBOL, JCL, z/OS, Db2, CICS
-│       └── open.instructions.md       ← Python, Bash, TypeScript
+│       └── scripting.instructions.md       ← Python, Bash, TypeScript
 ├── extensions/             ← Fichiers .vsix pré-téléchargés (gitignorés)
 └── zowe/                   ← Archives Zowe CLI hors-ligne (plugins)
 ```
@@ -161,6 +161,15 @@ comme volumes Docker dans le conteneur et assurent la persistance des données
 └── .gitconfig          → /home/zdev/.gitconfig
 ```
 
+Le fichier `.zshrc` est créé avec une configuration de base incluant la fonction
+`zdev` pour appeler l'API depuis le terminal VS Code :
+
+```bash
+zdev() { curl -s "http://zdev-api:5000${1:-/}"; }
+# Exemples : zdev     → statut de l'API
+#            zdev /datasets
+```
+
 > **Attention :** si `~/zdev/` existe déjà, ce script le supprime avant de le
 > recréer. Sauvegardez `~/zdev/projects/` au préalable si nécessaire.
 
@@ -199,7 +208,7 @@ Contient les instructions transmises à GitHub Copilot via la fonctionnalité
 - **`instructions/mainframe.instructions.md`** — instructions spécifiques au
   développement IBM z/OS : IBM Enterprise COBOL 6.5, JCL, VSAM, Db2, CICS,
   HLASM. Appliquées aux fichiers `.cbl`, `.jcl`, `.asm`, etc.
-- **`instructions/open.instructions.md`** — instructions pour Python, Bash et
+- **`instructions/scripting.instructions.md`** — instructions pour Python, Bash et
   TypeScript (développement ouvert). Appliquées aux fichiers `.py`, `.sh`, `.ts`.
 
 Ces fichiers utilisent le champ `applyTo` dans leur en-tête pour cibler
