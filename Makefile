@@ -16,6 +16,9 @@
 #   PROXY               Surcharge manuelle du proxy (ex: make build PROXY=http://...)
 # ─────────────────────────────────────────────────────────────────────────────
 
+PORT     ?= 8001
+PID_FILE := .mkdocs.pid
+
 .DEFAULT_GOAL := help
 
 # Détection automatique de la plateforme cible
@@ -35,7 +38,8 @@ ifneq ($(strip $(PROXY)),)
   IDE_BUILD_ARGS += --build-arg HTTP_PROXY=$(PROXY) --build-arg HTTPS_PROXY=$(PROXY)
 endif
 
-.PHONY: build build-ide build-api up down logs setup-host fetch-ext clean help
+.PHONY: build build-ide build-api up down logs setup-host fetch-ext clean \
+        docs docs-start docs-stop docs-build help
 
 build: build-ide build-api  ## Build les deux images Docker
 
@@ -68,6 +72,22 @@ fetch-ext:                   ## Télécharge les .vsix (proxy auto depuis HTTP_P
 
 clean:                       ## Supprime les images Docker locales
 	docker rmi -f zdev-ide:latest zdev-api:latest 2>/dev/null || true
+
+docs:                        ## Démarre MkDocs en mode live-reload (port $(PORT))
+	uv run mkdocs serve --dev-addr 0.0.0.0:$(PORT)
+
+docs-start:                  ## Démarre MkDocs en arrière-plan
+	uv run mkdocs serve --dev-addr 0.0.0.0:$(PORT) & echo $$! > $(PID_FILE)
+
+docs-stop:                   ## Arrête le serveur MkDocs en arrière-plan
+	@if [ -f $(PID_FILE) ]; then \
+		kill $$(cat $(PID_FILE)) && rm $(PID_FILE); \
+	else \
+		echo "No MkDocs server running ($(PID_FILE) not found)"; \
+	fi
+
+docs-build:                  ## Génère le site statique dans site/
+	uv run mkdocs build
 
 help:                        ## Affiche cette aide
 	@echo ""

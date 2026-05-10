@@ -1,0 +1,79 @@
+site_name: zdev — Environnement mainframe IBM z/OS
+theme:
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - toc.integrate
+    - content.code.copy
+  palette:
+    - scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Mode sombre
+    - scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Mode clair
+
+nav:
+  - Accueil: index.md
+  - Guide:
+    - Installation: guide/installation.md
+    - Utilisation: guide/utilisation.md
+    - Zowe CLI: guide/zowe.md
+  - Architecture:
+    - Vue d'ensemble: architecture/vue-ensemble.md
+    - Mécanisme extensions: architecture/extensions.md
+    - Persistance & Proxy: architecture/persistance.md
+  - Extensions VS Code:
+    - Vue d'ensemble: extensions/index.md
+    - Zowe Explorer: extensions/zowe-explorer.md
+    - Zowe FTP: extensions/zowe-ftp.md
+    - Zowe CICS Explorer: extensions/zowe-cics.md
+    - Z Open Editor: extensions/z-open-editor.md
+    - Z Open Debug: extensions/z-open-debug.md
+    - Compiled Code Coverage: extensions/compiled-code-coverage.md
+    - Db2 Developer Extension: extensions/db2.md
+    - File Manager: extensions/file-manager.md
+    - Fault Analyzer: extensions/fault-analyzer.md
+    - APA: extensions/apa.md
+    - TAZ Early Dev Testing: extensions/taz.md
+    - ADFz Common Component: extensions/adfz-common.md
+    - Outils généraux: extensions/outils-generaux.md
+  - API: api/reference.md
+  - Dépannage: depannage.md
+
+plugins:
+  - search
+  - minify:
+      minify_html: true
+  - git-revision-date-localized:
+      enable_creation_date: true
+  - awesome-pages
+  - include-markdown
+  - macros
+
+markdown_extensions:
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - admonition
+  - pymdownx.details
+  - pymdownx.tabbed:
+      alternate_style: true
+  - tables
+  - attr_list
+  - md_in_html
+  - toc:
+      permalink: true
+
+extra_css:
+  - stylesheets/extra.css
