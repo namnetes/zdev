@@ -8,9 +8,26 @@
     **Consulter ce projet avant toute mise en œuvre** pour s'assurer d'utiliser
     des versions compatibles et une configuration à jour.
 
+## Modes de connectivité
+
+| Mode              | Protocole | Prérequis côté z/OS                  | Recommandé |
+|-------------------|-----------|--------------------------------------|------------|
+| **RSE API**       | HTTPS     | IBM RSE API Server (port 6800)       | ✅ Oui — utilisé en priorité |
+| **z/OSMF**        | HTTPS     | z/OSMF actif (port 443 ou 1443)      | Pour l'administration système |
+| **FTP**           | FTP       | Démon FTP z/OS + `JESINTERFACELevel=2` | Environnements sans z/OSMF |
+
 !!! info "Ce dont vous avez besoin"
-    Demandez à votre administrateur z/OS l'URL du service z/OSMF
+    Demandez à votre administrateur z/OS l'URL du service RSE API
+    (ex : `https://mon-mainframe:6800`) ou z/OSMF
     (ex : `https://mon-mainframe:443`), votre user ID et votre mot de passe z/OS.
+
+!!! warning "Stockage sécurisé des identifiants (Ubuntu)"
+    Zowe stocke les credentials via `libsecret`. Sur Ubuntu, installer avant
+    de lancer le conteneur :
+    ```bash
+    sudo apt install gnome-keyring libsecret-1-0 libsecret-1-dev
+    ```
+    Sur macOS, le Keychain natif est utilisé automatiquement.
 
 ---
 
@@ -31,23 +48,47 @@
 
 Ouvrez un terminal dans VS Code (`Ctrl+ù` ou **Terminal → Nouveau terminal**) :
 
-```bash
-# 1. Initialiser le fichier de configuration Zowe (une seule fois)
-zowe config init --global-config
+=== "RSE API (recommandé)"
 
-# 2. Tester la connexion à z/OSMF
-zowe zosmf check status \
-  --host mon-mainframe --port 443 \
-  --user monuser --password monpass \
-  --reject-unauthorized false
+    ```bash
+    # 1. Initialiser la configuration Zowe (une seule fois)
+    zowe config init --global-config
 
-# 3. Enregistrer le profil pour ne plus retaper les paramètres
-zowe config set profiles.prod.properties.host mon-mainframe
-zowe config set profiles.prod.properties.port 443
-zowe config set profiles.prod.properties.user monuser
-zowe config set profiles.prod.properties.password monpass
-zowe config set profiles.prod.properties.rejectUnauthorized false
-```
+    # 2. Tester la connexion RSE API
+    zowe rse check status \
+      --host mon-mainframe --port 6800 \
+      --user monuser --password monpass \
+      --reject-unauthorized false
+
+    # 3. Enregistrer le profil RSE
+    zowe config set profiles.rse_prod.type rse
+    zowe config set profiles.rse_prod.properties.host mon-mainframe
+    zowe config set profiles.rse_prod.properties.port 6800
+    zowe config set profiles.rse_prod.properties.basePath rseapi
+    zowe config set profiles.rse_prod.properties.protocol https
+    zowe config set profiles.rse_prod.properties.rejectUnauthorized false
+    zowe config set defaults.rse rse_prod
+    ```
+
+=== "z/OSMF"
+
+    ```bash
+    # 1. Initialiser la configuration Zowe (une seule fois)
+    zowe config init --global-config
+
+    # 2. Tester la connexion à z/OSMF
+    zowe zosmf check status \
+      --host mon-mainframe --port 443 \
+      --user monuser --password monpass \
+      --reject-unauthorized false
+
+    # 3. Enregistrer le profil
+    zowe config set profiles.prod.properties.host mon-mainframe
+    zowe config set profiles.prod.properties.port 443
+    zowe config set profiles.prod.properties.user monuser
+    zowe config set profiles.prod.properties.password monpass
+    zowe config set profiles.prod.properties.rejectUnauthorized false
+    ```
 
 ---
 

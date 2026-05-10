@@ -4,11 +4,25 @@ Ces étapes sont à réaliser **une seule fois** lors de la première mise en pl
 
 ## Prérequis
 
-| Outil                        | Rôle                        |
-|------------------------------|-----------------------------|
-| Docker (Engine ou Desktop)   | Fait tourner les conteneurs |
-| Make                         | Lance les commandes projet  |
-| ~10 Go d'espace disque libre | Image + volumes             |
+| Outil                        | Version minimum | Rôle                        |
+|------------------------------|-----------------|-----------------------------|
+| Docker (Engine ou Desktop)   | —               | Fait tourner les conteneurs |
+| Make                         | —               | Lance les commandes projet  |
+| ~10 Go d'espace disque libre | —               | Image + volumes             |
+
+**Versions embarquées dans l'image `zdev-ide` :**
+
+| Composant       | Version | Notes                                              |
+|-----------------|---------|----------------------------------------------------|
+| Node.js LTS     | 22.22.2 | Versions 20, 22, 24 supportées par Zowe v3 — 22 recommandée (Active LTS jusqu'en avril 2027) |
+| Java            | JDK 21  | Minimum JRE 17 requis par Z Open Editor            |
+| Zowe CLI        | v3.4 (zowe-v3-lts) | Versions Node.js 25+ non supportées       |
+| VS Code (code-server) | 4.117.0 | Minimum VS Code API 1.90.0+              |
+
+!!! note "Référence versions"
+    Les versions ci-dessus sont validées par le projet
+    [namnetes/zowe-client](https://github.com/namnetes/zowe-client)
+    qui fait référence pour la compatibilité Zowe.
 
 ---
 

@@ -4,12 +4,28 @@
 
 | Service     | Port | Base image         | Rôle                                              |
 |-------------|------|--------------------|---------------------------------------------------|
-| `zdev-ide`  | 8443 | Debian             | code-server + IBM mainframe tools + Java 21, Node, Python |
+| `zdev-ide`  | 8443 | Debian bookworm-slim | code-server + IBM mainframe tools               |
 | `zdev-api`  | 5000 | python:3.14-slim   | API FastAPI (backend du projet)                   |
 
 Les deux services sont définis dans `docker-compose.yml` et partagent le réseau
 Docker `zdev_default` — `zdev-ide` peut appeler `zdev-api` via
 `http://zdev-api:5000` sans passer par l'hôte.
+
+---
+
+## Versions clés dans `zdev-ide`
+
+| Composant       | Version  | Référence de compatibilité                                    |
+|-----------------|----------|---------------------------------------------------------------|
+| Node.js LTS     | **22.22.2** | Zowe v3 supporte 20, 22, 24 — Node 22 recommandé (LTS jusqu'en avril 2027) |
+| Java            | JDK 21   | Minimum JRE 17 pour Z Open Editor ; JDK 21 recommandé        |
+| Zowe CLI        | v3.4 (`zowe-v3-lts`) | Versions Node 25+ **non supportées**             |
+| code-server     | 4.117.0  | VS Code API 1.90.0+                                          |
+| Python          | 3.x      | Disponible pour les scripts et le SDK Zowe Python            |
+
+!!! note "Source des versions"
+    Versions validées par [namnetes/zowe-client](https://github.com/namnetes/zowe-client)
+    — référence à consulter avant toute mise à jour.
 
 ---
 
