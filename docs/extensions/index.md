@@ -17,7 +17,7 @@ développement IBM z/OS, Python, Shell et les outils généraux.
 
 | Composant          | Version dans `zdev-ide` | Statut Zowe v3.4          |
 |--------------------|-------------------------|---------------------------|
-| Node.js            | **22.22.2** (LTS)       | ✅ Supporté (20, 22, 24)  |
+| Node.js            | **24.15.0** (LTS)       | ✅ Supporté (20, 22, 24)  |
 | Java               | JDK 21                  | ✅ Supporté (min JRE 17)  |
 | VS Code API        | 1.90.0+                 | ✅ Requis minimum          |
 | Zowe CLI           | v3.4 (zowe-v3-lts)      | ✅ Courant                 |

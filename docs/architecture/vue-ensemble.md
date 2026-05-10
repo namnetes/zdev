@@ -17,7 +17,7 @@ Docker `zdev_default` — `zdev-ide` peut appeler `zdev-api` via
 
 | Composant       | Version  | Référence de compatibilité                                    |
 |-----------------|----------|---------------------------------------------------------------|
-| Node.js LTS     | **22.22.2** | Zowe v3 supporte 20, 22, 24 — Node 22 recommandé (LTS jusqu'en avril 2027) |
+| Node.js LTS     | **24.15.0** | Zowe v3 supporte 20, 22, 24 — Node 24 Active LTS jusqu'en avril 2028 |
 | Java            | JDK 21   | Minimum JRE 17 pour Z Open Editor ; JDK 21 recommandé        |
 | Zowe CLI        | v3.4 (`zowe-v3-lts`) | Versions Node 25+ **non supportées**             |
 | code-server     | 4.117.0  | VS Code API 1.90.0+                                          |

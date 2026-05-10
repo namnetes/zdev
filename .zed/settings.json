@@ -1,0 +1,9 @@
+{
+  "languages": {
+    "Markdown": {
+      "format_on_save": "off",
+      "tab_size": 4,
+      "hard_tabs": false
+    }
+  }
+}
