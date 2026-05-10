@@ -22,11 +22,21 @@ nav:
   - Guide:
     - Installation: guide/installation.md
     - Utilisation: guide/utilisation.md
+    - Arborescence du projet: guide/arborescence.md
     - Zowe CLI: guide/zowe.md
   - Architecture:
     - Vue d'ensemble: architecture/vue-ensemble.md
     - Mécanisme extensions: architecture/extensions.md
     - Persistance & Proxy: architecture/persistance.md
+  - Lecture des sources:
+    - Introduction: sources/index.md
+    - Makefile: sources/makefile.md
+    - docker-compose.yml: sources/docker-compose.md
+    - ide/Dockerfile: sources/dockerfile.md
+    - ide/entrypoint.sh: sources/entrypoint.md
+    - ide/fetch_extensions.sh: sources/fetch-extensions.md
+    - ide/setup_host.sh: sources/setup-host.md
+    - Code de l'API: sources/api-code.md
   - Extensions VS Code:
     - Vue d'ensemble: extensions/index.md
     - Zowe Explorer: extensions/zowe-explorer.md
