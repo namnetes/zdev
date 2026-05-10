@@ -1,5 +1,13 @@
 # Configurer Zowe CLI pour se connecter à z/OS
 
+!!! important "Référence Zowe — projet compagnon"
+    Le projet **[namnetes/zowe-client](https://github.com/namnetes/zowe-client)**
+    documente les usages, prérequis et configurations des clients Zowe
+    (Zowe CLI, Zowe Explorer, SDK Zowe).
+
+    **Consulter ce projet avant toute mise en œuvre** pour s'assurer d'utiliser
+    des versions compatibles et une configuration à jour.
+
 !!! info "Ce dont vous avez besoin"
     Demandez à votre administrateur z/OS l'URL du service z/OSMF
     (ex : `https://mon-mainframe:443`), votre user ID et votre mot de passe z/OS.

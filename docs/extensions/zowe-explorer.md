@@ -1,5 +1,13 @@
 # Zowe Explorer (`Zowe.vscode-extension-for-zowe`)
 
+!!! important "Référence Zowe — projet compagnon"
+    Le projet **[namnetes/zowe-client](https://github.com/namnetes/zowe-client)**
+    documente les usages, prérequis et configurations des clients Zowe
+    (Zowe CLI, Zowe Explorer, SDK Zowe).
+
+    **Consulter ce projet avant toute mise en œuvre** pour s'assurer d'utiliser
+    des versions compatibles et une configuration à jour.
+
 Point d'entrée principal pour interagir avec z/OS : datasets, fichiers USS,
 soumission et suivi de jobs. Requis par la quasi-totalité des extensions IBM.
 

@@ -1,5 +1,13 @@
 # Extensions VS Code — Vue d'ensemble
 
+!!! important "Référence Zowe — projet compagnon"
+    Le projet **[namnetes/zowe-client](https://github.com/namnetes/zowe-client)**
+    documente en détail les usages, prérequis et configurations des clients Zowe :
+    Zowe CLI, Zowe Explorer et les SDK Zowe.
+
+    **Consulter ce projet avant toute mise en œuvre** pour s'assurer d'utiliser
+    des versions compatibles et une configuration à jour.
+
 `zdev-ide` embarque un ensemble d'extensions pré-installées couvrant le
 développement IBM z/OS, Python, Shell et les outils généraux.
 
